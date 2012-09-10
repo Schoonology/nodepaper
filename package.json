@@ -1,0 +1,22 @@
+{
+  "name": "nodepaper",
+  "version": "0.1.0",
+  "description": "A very simple Node.js-based content management system.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Michael Schoonmaker <michael.r.schoonmaker@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Schoonology/stepdown.git"
+  },
+  "dependencies": {
+    "stepdown": "~0.1.1",
+    "marked": "~0.2.5",
+    "mongodb": "~1.1.6",
+    "express": "~3.0.0rc4",
+    "plates": "https://github.com/flatiron/plates/tarball/master"
+  },
+  "license": "MIT"
+}
