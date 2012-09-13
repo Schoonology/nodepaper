@@ -1,4 +1,5 @@
 module.exports = {
+    Document: require('./lib/document'),
     Article: require('./lib/article'),
     Collection: require('./lib/collection'),
     Theme: require('./lib/theme'),
