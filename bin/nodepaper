@@ -1,0 +1,49 @@
+#!/usr/bin/env node
+var lib = require('../lib')
+  , middleware = require('../middleware')
+  , rc = lib('rc')
+  , http = require('http')
+  , path = require('path')
+  , express = require('express')
+  , app = express()
+
+app
+  .use(express.favicon()) // TODO: Provide.
+  .use(express.logger())
+  .use(express.cookieParser())
+  .use(express.bodyParser())
+  .use(express.query())
+  .use(app.router)
+  .use(express.static(path.resolve(__dirname, '..', rc.paths.static))) // TODO: Cache.
+  .use(express.errorHandler())
+
+http.createServer(app).listen(rc.port, function (err) {
+  if (err) {
+    console.error(err.stack || err.message || err)
+    process.exit(1)
+  } else {
+    console.info('Listening on port ' + rc.port + '...')
+  }
+})
+
+//
+// ## Routes
+//
+app.put('*', middleware('validateSecret'))
+app.all('/ping', middleware('ping'))
+
+// app.get('/articles', middleware('findResource')(lib('article')))
+// app.get('/articles/:name', middleware('getResource')(lib('article')))
+// app.put('/articles/:name', middleware('putResource')(lib('article')))
+
+app.get('/pages', middleware('findResource')(lib('page')))
+app.get('/pages/:name', middleware('getResource')(lib('page')))
+app.put('/pages/:name', middleware('putResource')(lib('page')))
+
+// app.get('/authors', middleware('findResource')(lib('author')))
+// app.get('/authors/:name', middleware('getResource')(lib('author')))
+// app.put('/authors/:name', middleware('putResource')(lib('author')))
+
+// app.get('/media', middleware('findResource')(lib('media')))
+// app.get('/media/:name', middleware('getResource')(lib('media')))
+// app.put('/media/:name', middleware('putResource')(lib('media')))

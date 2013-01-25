@@ -1,6 +1,6 @@
 {
   "name": "nodepaper",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A very simple Node.js-based content management system.",
   "main": "index.js",
   "scripts": {
@@ -9,20 +9,13 @@
   "author": "Michael Schoonmaker <michael.r.schoonmaker@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Schoonology/stepdown.git"
+    "url": "git://github.com/Schoonology/nodepaper.git"
   },
   "dependencies": {
-    "stepdown": "0.2.3",
-    "marked": "0.2.5",
-    "mongodb": "1.1.6",
-    "express": "3.0.0rc4",
-    "dustjs-linkedin": "~1.1.0",
-    "watch": "~0.5.1",
-    "jugglingdb": "~0.1.18"
+    "express": "~3.0.6",
+    "localrc": "~0.1.0",
+    "rc": "0.0.6",
+    "stepdown": "~0.3.11"
   },
-  "license": "MIT",
-  "directories": {
-    "test": "test"
-  },
-  "devDependencies": {}
+  "license": "MIT"
 }

@@ -1,0 +1,308 @@
+<!doctype html>
+<html ng-app="nodepaper">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Nodepaper Editor</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/codemirror.css" rel="stylesheet">
+    <link href="/css/codemirror/monokai.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="#">Nodepaper Editor</a>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="span12">
+        </div>
+      </div>
+      <div class="row">
+        <div class="span3">
+        </div>
+        <div class="span9">
+          <div class="tabbable">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#preview" data-toggle="tab">Preview</a></li>
+              <li><a href="#edit-html" data-toggle="tab">Edit HTML</a></li>
+              <li><a href="#edit-json" data-toggle="tab">Edit JSON</a></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" id="preview">
+                <div ng-bind-html-unsafe="testStuff"></div>
+                <div ng-bind="testMeta"></div>
+              </div>
+              <div class="tab-pane" id="edit-html">
+                <codemirror ng-model="testStuff" mode="htmlmixed"></codemirror>
+              </div>
+              <div class="tab-pane" id="edit-json">
+                <codemirror ng-model="testMeta" mode="json"></codemirror>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div ng-view></div> -->
+
+    <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script> -->
+    <script>window.jQuery || document.write('<script src="/js/lib/jquery.js"><\/script>')</script>
+    <!-- <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.js"></script> -->
+    <script>window.angular || document.write('<script src="/js/lib/angular.js"><\/script>')</script>
+    <script src="/js/lib/bootstrap.min.js"></script>
+    <script src="/js/lib/codemirror.js"></script>
+    <script src="/js/lib/codemirror/javascript.js"></script>
+    <script src="/js/lib/codemirror/xml.js"></script>
+    <script src="/js/lib/codemirror/css.js"></script>
+    <script src="/js/lib/codemirror/htmlmixed.js"></script>
+    <script src="/js/lib/codemirror/edit/closetag.js"></script>
+    <script src="/js/directives.js"></script>
+    <!-- <script src="/js/lib/lawnchair.js"></script> -->
+    <!-- <script src="/js/lib/moment.js"></script> -->
+    <!-- <script src="/js/lib/jqconsole.min.js"></script> -->
+    <!-- <script src="/js/cushion.js"></script> -->
+    <script src="/js/lib/md5.js"></script>
+    <script>
+      angular
+        .module('nodepaper', ['codemirror'])
+      //   .config(function ($routeProvider) {
+      //     $routeProvider
+      //       .when('/articles/:name', {
+      //         template: '<div template="content"></div>',
+      //         controller: ArticleController
+      //       })
+      //       .when('/pages/:name', {
+      //         template: '<div template="content"></div>',
+      //         controller: PageController
+      //       })
+      //       .when('/authors/:name', {
+      //         template: '<div template="content"></div>',
+      //         controller: AuthorController
+      //       })
+      //       .otherwise({
+      //         redirectTo: '/'
+      //       })
+      //   })
+          // .directive('codemirror', function () {
+          //   return function codemirror(scope, element, attrs) {
+          //     scope.$watch(
+          //       function (scope) {
+          //         return scope.mode || attrs.mode || 'javascript'
+          //       },
+          //       function (value) {
+          //         scope.mirror = CodeMirror.fromTextArea(element, {
+          //           lineNumbers: true,
+          //           mode: scope.mode,
+          //           theme: scope.theme || attrs.theme || 'monokai'
+          //         })
+          //       }
+          //     )
+          //   }
+          // })
+      //   .directive('template', function ($compile) {
+      //     return function template(scope, element, attrs) {
+      //       scope.$watch(
+      //         function (scope) {
+      //           return scope.$eval(attrs.template)
+      //         },
+      //         function (value) {
+      //           element.html(value)
+
+      //           $compile(element.contents())(scope)
+      //         }
+      //       )
+      //     }
+      //   })
+      //   .factory('Resource', function ($http) {
+      //     var controller = {}
+
+      //     function request(method, url, data) {
+      //       var headers = {}
+      //         , timestamp
+      //         , nonce
+      //         , signature
+
+      //       if (method.toLowerCase() === 'put' || method.toLowerCase() === 'del') {
+      //         timestamp = Date.now()
+      //         nonce = Math.random().toString().slice(2) + timestamp
+      //         signature = hex_md5('removeme' + nonce)
+
+      //         headers = {
+      //           'X-Nodepaper-Key': 'test',
+      //           'X-Nodepaper-Timestamp': timestamp,
+      //           'X-Nodepaper-Signature': signature,
+      //           'X-Nodepaper-Nonce': nonce
+      //         }
+      //       }
+
+      //       return $http({
+      //         method: method,
+      //         url: url,
+      //         params: null,
+      //         data: data || {},
+      //         headers: headers,
+      //         cache: false,
+      //         timeout: 1000
+      //       })
+      //     }
+
+      //     controller.save = save
+      //     function save(path, body) {
+      //       return request('PUT', path, body)
+      //     }
+
+      //     controller.load = load
+      //     function load(path) {
+      //       return request('GET', path)
+      //     }
+
+      //     controller.find = find
+      //     function find(path) {
+      //       return request('GET', path)
+      //     }
+
+      //     return controller
+      //   })
+      //   .factory('Article', function (Resource) {
+      //     var controller = {}
+      //       , root = '/articles'
+
+      //     controller.save = save
+      //     function save(name, body) {
+      //       return Resource.save(root + '/' + name, body)
+      //     }
+
+      //     controller.load = load
+      //     function load(name) {
+      //       return Resource.load(root + '/' + name)
+      //     }
+
+      //     controller.find = find
+      //     function find() {
+      //       return Resource.find(root)
+      //     }
+
+      //     return controller
+      //   })
+      //   .factory('Author', function (Resource) {
+      //     var controller = {}
+      //       , root = '/authors'
+
+      //     controller.save = save
+      //     function save(name, body) {
+      //       return Resource.save(root + '/' + name, body)
+      //     }
+
+      //     controller.load = load
+      //     function load(name) {
+      //       return Resource.load(root + '/' + name)
+      //     }
+
+      //     controller.find = find
+      //     function find() {
+      //       return Resource.find(root)
+      //     }
+
+      //     return controller
+      //   })
+      //   .factory('Page', function (Resource) {
+      //     var controller = {}
+      //       , root = '/pages'
+
+      //     controller.save = save
+      //     function save(name, body) {
+      //       return Resource.save(root + '/' + name, body)
+      //     }
+
+      //     controller.load = load
+      //     function load(name) {
+      //       return Resource.load(root + '/' + name)
+      //     }
+
+      //     controller.find = find
+      //     function find() {
+      //       return Resource.find(root)
+      //     }
+
+      //     return controller
+      //   })
+
+      // function ArticleController($scope, $route, $compile, Article) {
+      //   var name = $route.current.params.name
+
+      //   Article
+      //     .load(name)
+      //     .then(function (response) {
+      //       Object.keys(response.data).forEach(function (key) {
+      //         $scope[key] = response.data[key]
+      //       })
+      //     })
+      // }
+
+      // function AuthorController($scope, $route, $compile, Author) {
+      //   var name = $route.current.params.name
+
+      //   Author
+      //     .load(name)
+      //     .then(function (response) {
+      //       Object.keys(response.data).forEach(function (key) {
+      //         $scope[key] = response.data[key]
+      //       })
+      //     })
+      // }
+
+      // function PageController($scope, $route, $compile, Page) {
+      //   var name = $route.current.params.name
+
+      //   Page
+      //     .load(name)
+      //     .then(function (response) {
+      //       Object.keys(response.data).forEach(function (key) {
+      //         $scope[key] = response.data[key]
+      //       })
+      //     })
+      // }
+
+      // function TestController($scope, $http) {
+      //   window.$scope = $scope
+      //   window.$http = $http
+
+      //   $scope.test = function test() {
+      //     var timestamp = Date.now()
+      //       , nonce = Math.random().toString().slice(2) + timestamp
+      //       , signature = hex_md5('removeme' + nonce)
+
+      //     $http({
+      //       method: 'PUT',
+      //       url: '/pages/test',
+      //       params: null,
+      //       data: {
+      //         'public': false,
+      //         'author': 'schoon',
+      //         'content': '<p>This is just a test.</p>'
+      //       },
+      //       headers: {
+      //         'X-Nodepaper-Key': 'test',
+      //         'X-Nodepaper-Timestamp': timestamp,
+      //         'X-Nodepaper-Signature': signature,
+      //         'X-Nodepaper-Nonce': nonce
+      //       },
+      //       cache: false,
+      //       timeout: 1000
+      //     }).then(function (response) {
+      //       console.log('Response:', response)
+      //     })
+      //   }
+      // }
+    </script>
+  </body>
+</html>

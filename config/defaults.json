@@ -1,0 +1,16 @@
+{
+  "port": 1337,
+  "keys": {
+    "test": "removeme"
+  },
+  "paths": {
+    "static": "./static",
+    "pages": "./content/pages",
+    "articles": "./content/articles",
+    "authors": "./content/authors",
+    "media": "./content/media"
+  },
+  "requests": {
+    "window": 1000
+  }
+}

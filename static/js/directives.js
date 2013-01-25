@@ -1,0 +1,58 @@
+/*global angular, CodeMirror */
+/*jshint browser:true */
+(function (global) {
+  function toString(value) {
+    if (angular.isUndefined(value) || value === null) {
+      return ''
+    } else if (angular.isObject(value) || angular.isArray(value)) {
+      return JSON.stringify(value, null, 2)
+    }
+
+    return String(value)
+  }
+
+  angular
+    .module('codemirror', [])
+    .directive('codemirror', function ($timeout) {
+      return {
+        restrict: 'E',
+        require: 'ngModel',
+        template: '<textarea></textarea>',
+        link: function (scope, $el, attrs, ngModel) {
+          var mode = attrs.mode
+            , theme = attrs.theme
+            , json = false
+
+          if (mode === 'json') {
+            mode = 'javascript'
+            json = true
+          }
+
+          $timeout(function () {
+            var mirror = CodeMirror.fromTextArea($el[0], {
+              mode: mode || 'javascript',
+              theme: theme || 'monokai',
+              json: json,
+              autoCloseTags: true
+            })
+
+            mirror.on('change', function () {
+              var value = mirror.getValue()
+
+              if (value !== ngModel.$viewValue && !scope.$$phase) {
+                scope.$apply(function() {
+                  ngModel.$setViewValue(value)
+                })
+              }
+            })
+
+            ngModel.$formatters.push(toString)
+
+            ngModel.$render = function () {
+              mirror.setValue(ngModel.$viewValue)
+            }
+          })
+        }
+      }
+    })
+})(window)
