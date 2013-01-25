@@ -1,4 +1,5 @@
 {
-  "public": true,
+  "title": "This is the New Title",
+  "public": false,
   "author": "schoon"
 }

@@ -28,27 +28,13 @@
       </div>
       <div class="row">
         <div class="span3">
+          <ul class="nav nav-list" ng-controller="PageNavController" np-active>
+            <li class="nav-header">Pages</li>
+            <li ng-repeat="page in pages"><a ng-href="#/pages/{{page}}" ng-bind="page"></a></li>
+          </ul>
         </div>
         <div class="span9">
-          <div class="tabbable">
-            <ul class="nav nav-tabs">
-              <li class="active"><a href="#preview" data-toggle="tab">Preview</a></li>
-              <li><a href="#edit-html" data-toggle="tab">Edit HTML</a></li>
-              <li><a href="#edit-json" data-toggle="tab">Edit JSON</a></li>
-            </ul>
-            <div class="tab-content">
-              <div class="tab-pane active" id="preview">
-                <div ng-bind-html-unsafe="testStuff"></div>
-                <div ng-bind="testMeta"></div>
-              </div>
-              <div class="tab-pane" id="edit-html">
-                <codemirror ng-model="testStuff" mode="htmlmixed"></codemirror>
-              </div>
-              <div class="tab-pane" id="edit-json">
-                <codemirror ng-model="testMeta" mode="json"></codemirror>
-              </div>
-            </div>
-          </div>
+          <div ng-view></div>
         </div>
       </div>
     </div>
@@ -65,7 +51,9 @@
     <script src="/js/lib/codemirror/css.js"></script>
     <script src="/js/lib/codemirror/htmlmixed.js"></script>
     <script src="/js/lib/codemirror/edit/closetag.js"></script>
+    <script src="/js/directive.codemirror.js"></script>
     <script src="/js/directives.js"></script>
+    <script src="/js/services.js"></script>
     <!-- <script src="/js/lib/lawnchair.js"></script> -->
     <!-- <script src="/js/lib/moment.js"></script> -->
     <!-- <script src="/js/lib/jqconsole.min.js"></script> -->
@@ -73,41 +61,25 @@
     <script src="/js/lib/md5.js"></script>
     <script>
       angular
-        .module('nodepaper', ['codemirror'])
-      //   .config(function ($routeProvider) {
-      //     $routeProvider
+        .module('nodepaper', ['codemirror', 'nodepaper.services', 'nodepaper.directives'])
+        .config(function ($routeProvider) {
+          $routeProvider
       //       .when('/articles/:name', {
       //         template: '<div template="content"></div>',
       //         controller: ArticleController
       //       })
-      //       .when('/pages/:name', {
-      //         template: '<div template="content"></div>',
-      //         controller: PageController
-      //       })
+            .when('/pages/:name', {
+              templateUrl: '/partials/page.editor.html',
+              controller: PageEditorController
+            })
       //       .when('/authors/:name', {
       //         template: '<div template="content"></div>',
       //         controller: AuthorController
       //       })
-      //       .otherwise({
-      //         redirectTo: '/'
-      //       })
-      //   })
-          // .directive('codemirror', function () {
-          //   return function codemirror(scope, element, attrs) {
-          //     scope.$watch(
-          //       function (scope) {
-          //         return scope.mode || attrs.mode || 'javascript'
-          //       },
-          //       function (value) {
-          //         scope.mirror = CodeMirror.fromTextArea(element, {
-          //           lineNumbers: true,
-          //           mode: scope.mode,
-          //           theme: scope.theme || attrs.theme || 'monokai'
-          //         })
-          //       }
-          //     )
-          //   }
-          // })
+            .otherwise({
+              redirectTo: '/'
+            })
+        })
       //   .directive('template', function ($compile) {
       //     return function template(scope, element, attrs) {
       //       scope.$watch(
@@ -122,187 +94,83 @@
       //       )
       //     }
       //   })
-      //   .factory('Resource', function ($http) {
-      //     var controller = {}
+      function PageNavController($scope, $location, Page) {
+        $scope.pages = []
 
-      //     function request(method, url, data) {
-      //       var headers = {}
-      //         , timestamp
-      //         , nonce
-      //         , signature
+        Page
+          .find()
+          .then(function (list) {
+            $scope.pages = list
+          })
+      }
 
-      //       if (method.toLowerCase() === 'put' || method.toLowerCase() === 'del') {
-      //         timestamp = Date.now()
-      //         nonce = Math.random().toString().slice(2) + timestamp
-      //         signature = hex_md5('removeme' + nonce)
+      function ArticleController($scope, $route, $compile, Article) {
+        var name = $route.current.params.name
 
-      //         headers = {
-      //           'X-Nodepaper-Key': 'test',
-      //           'X-Nodepaper-Timestamp': timestamp,
-      //           'X-Nodepaper-Signature': signature,
-      //           'X-Nodepaper-Nonce': nonce
-      //         }
-      //       }
+        Article
+          .load(name)
+          .then(function (data) {
+            Object.keys(data).forEach(function (key) {
+              $scope[key] = data[key]
+            })
+          })
+      }
 
-      //       return $http({
-      //         method: method,
-      //         url: url,
-      //         params: null,
-      //         data: data || {},
-      //         headers: headers,
-      //         cache: false,
-      //         timeout: 1000
-      //       })
-      //     }
+      function AuthorController($scope, $route, $compile, Author) {
+        var name = $route.current.params.name
 
-      //     controller.save = save
-      //     function save(path, body) {
-      //       return request('PUT', path, body)
-      //     }
+        Author
+          .load(name)
+          .then(function (data) {
+            Object.keys(data).forEach(function (key) {
+              $scope[key] = data[key]
+            })
+          })
+      }
 
-      //     controller.load = load
-      //     function load(path) {
-      //       return request('GET', path)
-      //     }
+      function PageController($scope, $route, $compile, Page) {
+        // TODO: Load only if meta and content aren't already present (i.e. we're nested in another Controller.)
 
-      //     controller.find = find
-      //     function find(path) {
-      //       return request('GET', path)
-      //     }
+        return
 
-      //     return controller
-      //   })
-      //   .factory('Article', function (Resource) {
-      //     var controller = {}
-      //       , root = '/articles'
+        var name = $route.current.params.name
 
-      //     controller.save = save
-      //     function save(name, body) {
-      //       return Resource.save(root + '/' + name, body)
-      //     }
+        Page
+          .load(name)
+          .then(function (data) {
+            Object.keys(data).forEach(function (key) {
+              $scope[key] = data[key]
+            })
+          })
+      }
 
-      //     controller.load = load
-      //     function load(name) {
-      //       return Resource.load(root + '/' + name)
-      //     }
+      function PageEditorController($scope, $route, $compile, Page) {
+        var name = $route.current.params.name
 
-      //     controller.find = find
-      //     function find() {
-      //       return Resource.find(root)
-      //     }
+        $scope.previewTemplateUrl = '/partials/page.html'
+        $scope.meta = {}
+        $scope.content = ''
 
-      //     return controller
-      //   })
-      //   .factory('Author', function (Resource) {
-      //     var controller = {}
-      //       , root = '/authors'
+        $scope.save = function () {
+          var body = {
+            meta: $scope.meta,
+            content: $scope.content
+          }
 
-      //     controller.save = save
-      //     function save(name, body) {
-      //       return Resource.save(root + '/' + name, body)
-      //     }
+          Page
+            .save(name, body)
+            .then(function (data) {
+              console.log('Saved:', data)
+            })
+        }
 
-      //     controller.load = load
-      //     function load(name) {
-      //       return Resource.load(root + '/' + name)
-      //     }
-
-      //     controller.find = find
-      //     function find() {
-      //       return Resource.find(root)
-      //     }
-
-      //     return controller
-      //   })
-      //   .factory('Page', function (Resource) {
-      //     var controller = {}
-      //       , root = '/pages'
-
-      //     controller.save = save
-      //     function save(name, body) {
-      //       return Resource.save(root + '/' + name, body)
-      //     }
-
-      //     controller.load = load
-      //     function load(name) {
-      //       return Resource.load(root + '/' + name)
-      //     }
-
-      //     controller.find = find
-      //     function find() {
-      //       return Resource.find(root)
-      //     }
-
-      //     return controller
-      //   })
-
-      // function ArticleController($scope, $route, $compile, Article) {
-      //   var name = $route.current.params.name
-
-      //   Article
-      //     .load(name)
-      //     .then(function (response) {
-      //       Object.keys(response.data).forEach(function (key) {
-      //         $scope[key] = response.data[key]
-      //       })
-      //     })
-      // }
-
-      // function AuthorController($scope, $route, $compile, Author) {
-      //   var name = $route.current.params.name
-
-      //   Author
-      //     .load(name)
-      //     .then(function (response) {
-      //       Object.keys(response.data).forEach(function (key) {
-      //         $scope[key] = response.data[key]
-      //       })
-      //     })
-      // }
-
-      // function PageController($scope, $route, $compile, Page) {
-      //   var name = $route.current.params.name
-
-      //   Page
-      //     .load(name)
-      //     .then(function (response) {
-      //       Object.keys(response.data).forEach(function (key) {
-      //         $scope[key] = response.data[key]
-      //       })
-      //     })
-      // }
-
-      // function TestController($scope, $http) {
-      //   window.$scope = $scope
-      //   window.$http = $http
-
-      //   $scope.test = function test() {
-      //     var timestamp = Date.now()
-      //       , nonce = Math.random().toString().slice(2) + timestamp
-      //       , signature = hex_md5('removeme' + nonce)
-
-      //     $http({
-      //       method: 'PUT',
-      //       url: '/pages/test',
-      //       params: null,
-      //       data: {
-      //         'public': false,
-      //         'author': 'schoon',
-      //         'content': '<p>This is just a test.</p>'
-      //       },
-      //       headers: {
-      //         'X-Nodepaper-Key': 'test',
-      //         'X-Nodepaper-Timestamp': timestamp,
-      //         'X-Nodepaper-Signature': signature,
-      //         'X-Nodepaper-Nonce': nonce
-      //       },
-      //       cache: false,
-      //       timeout: 1000
-      //     }).then(function (response) {
-      //       console.log('Response:', response)
-      //     })
-      //   }
-      // }
+        Page
+          .load(name)
+          .then(function (data) {
+            $scope.content = data.content
+            $scope.meta = data.meta
+          })
+      }
     </script>
   </body>
 </html>

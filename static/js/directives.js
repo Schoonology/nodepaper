@@ -1,57 +1,32 @@
-/*global angular, CodeMirror */
+/*global angular */
 /*jshint browser:true */
 (function (global) {
-  function toString(value) {
-    if (angular.isUndefined(value) || value === null) {
-      return ''
-    } else if (angular.isObject(value) || angular.isArray(value)) {
-      return JSON.stringify(value, null, 2)
-    }
-
-    return String(value)
-  }
-
   angular
-    .module('codemirror', [])
-    .directive('codemirror', function ($timeout) {
+    .module('nodepaper.directives', [])
+    .directive('npActive', function ($location, $timeout) {
       return {
-        restrict: 'E',
-        require: 'ngModel',
-        template: '<textarea></textarea>',
-        link: function (scope, $el, attrs, ngModel) {
-          var mode = attrs.mode
-            , theme = attrs.theme
-            , json = false
-
-          if (mode === 'json') {
-            mode = 'javascript'
-            json = true
-          }
-
+        restrict: 'A',
+        link: function ($scope, $el, attrs) {
+          // TODO: Find a better way than $timeout.
           $timeout(function () {
-            var mirror = CodeMirror.fromTextArea($el[0], {
-              mode: mode || 'javascript',
-              theme: theme || 'monokai',
-              json: json,
-              autoCloseTags: true
-            })
-
-            mirror.on('change', function () {
-              var value = mirror.getValue()
-
-              if (value !== ngModel.$viewValue && !scope.$$phase) {
-                scope.$apply(function() {
-                  ngModel.$setViewValue(value)
-                })
-              }
-            })
-
-            ngModel.$formatters.push(toString)
-
-            ngModel.$render = function () {
-              mirror.setValue(ngModel.$viewValue)
+            if (!$el.hasClass('nav-list')) {
+              console.error('The np-active directive expects a ul.nav-list.')
             }
-          })
+
+            $scope.$watch(function (scope) {
+              return $location.path()
+            }, function (value) {
+              $el.find('a').each(function (key, a) {
+                var $a = angular.element(a)
+
+                if (a.hash === '#' + value) {
+                  $a.parent().addClass('active')
+                } else {
+                  $a.parent().removeClass('active')
+                }
+              })
+            })
+          }, 10)
         }
       }
     })

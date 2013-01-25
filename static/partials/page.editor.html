@@ -1,0 +1,19 @@
+<div class="tabbable">
+  <ul class="nav nav-pills">
+    <li class="active"><a href="#preview" data-toggle="tab">Preview</a></li>
+    <li><a href="#edit-html" data-toggle="tab">Edit HTML</a></li>
+    <li><a href="#edit-json" data-toggle="tab">Edit JSON</a></li>
+    <li class="pull-right"><a ng-click="save()">Save</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" id="preview">
+      <div ng-include="previewTemplateUrl" ng-controller="PageController"></div>
+    </div>
+    <div class="tab-pane" id="edit-html">
+      <codemirror ng-model="content" mode="htmlmixed"></codemirror>
+    </div>
+    <div class="tab-pane" id="edit-json">
+      <codemirror ng-model="meta" mode="json"></codemirror>
+    </div>
+  </div>
+</div>
