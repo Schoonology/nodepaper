@@ -1,6 +1,8 @@
 <!doctype html>
 <html ng-app="nodepaper">
   <head>
+    <base href="/editor/index.html">
+    <meta name="fragment" content="!" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
@@ -8,10 +10,10 @@
 
     <title>Nodepaper Editor</title>
 
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/style.css" rel="stylesheet">
-    <link href="/css/codemirror.css" rel="stylesheet">
-    <link href="/css/codemirror/monokai.css" rel="stylesheet">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <link href="/static/css/codemirror.css" rel="stylesheet">
+    <link href="/static/css/codemirror/monokai.css" rel="stylesheet">
   </head>
   <body>
     <div class="navbar navbar-fixed-top">
@@ -30,7 +32,7 @@
         <div class="span3">
           <ul class="nav nav-list" ng-controller="PageNavController" np-active>
             <li class="nav-header">Pages</li>
-            <li ng-repeat="page in pages"><a ng-href="#/pages/{{page}}" ng-bind="page"></a></li>
+            <li ng-repeat="page in pages"><a ng-href="pages/{{page}}" ng-bind="page"></a></li>
           </ul>
         </div>
         <div class="span9">
@@ -41,35 +43,36 @@
     <!-- <div ng-view></div> -->
 
     <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script> -->
-    <script>window.jQuery || document.write('<script src="/js/lib/jquery.js"><\/script>')</script>
+    <script>window.jQuery || document.write('<script src="/static/js/lib/jquery.js"><\/script>')</script>
     <!-- <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.js"></script> -->
-    <script>window.angular || document.write('<script src="/js/lib/angular.js"><\/script>')</script>
-    <script src="/js/lib/bootstrap.min.js"></script>
-    <script src="/js/lib/codemirror.js"></script>
-    <script src="/js/lib/codemirror/javascript.js"></script>
-    <script src="/js/lib/codemirror/xml.js"></script>
-    <script src="/js/lib/codemirror/css.js"></script>
-    <script src="/js/lib/codemirror/htmlmixed.js"></script>
-    <script src="/js/lib/codemirror/edit/closetag.js"></script>
-    <script src="/js/directive.codemirror.js"></script>
-    <script src="/js/directives.js"></script>
-    <script src="/js/services.js"></script>
-    <!-- <script src="/js/lib/lawnchair.js"></script> -->
-    <!-- <script src="/js/lib/moment.js"></script> -->
-    <!-- <script src="/js/lib/jqconsole.min.js"></script> -->
-    <!-- <script src="/js/cushion.js"></script> -->
-    <script src="/js/lib/md5.js"></script>
+    <script>window.angular || document.write('<script src="/static/js/lib/angular.js"><\/script>')</script>
+    <script src="/static/js/lib/bootstrap.min.js"></script>
+    <script src="/static/js/lib/codemirror.js"></script>
+    <script src="/static/js/lib/codemirror/javascript.js"></script>
+    <script src="/static/js/lib/codemirror/xml.js"></script>
+    <script src="/static/js/lib/codemirror/css.js"></script>
+    <script src="/static/js/lib/codemirror/htmlmixed.js"></script>
+    <script src="/static/js/lib/codemirror/edit/closetag.js"></script>
+    <script src="/static/js/directive.codemirror.js"></script>
+    <script src="/static/js/directives.js"></script>
+    <script src="/static/js/services.js"></script>
+    <!-- <script src="/static/js/lib/lawnchair.js"></script> -->
+    <!-- <script src="/static/js/lib/moment.js"></script> -->
+    <!-- <script src="/static/js/lib/jqconsole.min.js"></script> -->
+    <!-- <script src="/static/js/cushion.js"></script> -->
+    <script src="/static/js/lib/md5.js"></script>
     <script>
       angular
         .module('nodepaper', ['codemirror', 'nodepaper.services', 'nodepaper.directives'])
-        .config(function ($routeProvider) {
+        .config(function ($routeProvider, $locationProvider) {
+          $locationProvider.html5Mode(true).hashPrefix('!')
           $routeProvider
       //       .when('/articles/:name', {
       //         template: '<div template="content"></div>',
       //         controller: ArticleController
       //       })
             .when('/pages/:name', {
-              templateUrl: '/partials/page.editor.html',
+              templateUrl: '/static/partials/page.editor.html',
               controller: PageEditorController
             })
       //       .when('/authors/:name', {
@@ -147,7 +150,7 @@
       function PageEditorController($scope, $route, $compile, Page) {
         var name = $route.current.params.name
 
-        $scope.previewTemplateUrl = '/partials/page.html'
+        $scope.previewTemplateUrl = '/static/partials/page.html'
         $scope.meta = {}
         $scope.content = ''
 

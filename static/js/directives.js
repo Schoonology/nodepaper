@@ -13,20 +13,88 @@
               console.error('The np-active directive expects a ul.nav-list.')
             }
 
-            $scope.$watch(function (scope) {
-              return $location.path()
-            }, function (value) {
+            function setActive(value) {
               $el.find('a').each(function (key, a) {
                 var $a = angular.element(a)
 
-                if (a.hash === '#' + value) {
+                if ('/' + $a.attr('ng-href') === value) {
                   $a.parent().addClass('active')
                 } else {
                   $a.parent().removeClass('active')
                 }
               })
+            }
+
+            $scope.$watch(function (scope) {
+              return $location.path()
+            }, function (value) {
+              setActive(value)
             })
-          }, 10)
+
+            setActive($location.path())
+          }, 100)
+        }
+      }
+    })
+    .directive('npTabView', function () {
+      return {
+        restrict: 'A',
+        compile: function () {
+          return {
+            pre: function ($scope, $el, attrs) {
+              $scope.currentMode = null
+            },
+            post: function ($scope, $el, attrs) {
+              $scope.$watch('currentMode', function (newValue, oldValue) {
+                $el.find('*[np-tab-pane=' + oldValue + ']').hide()
+                $el.find('*[np-tab-pane=' + newValue + ']').show()
+              })
+
+              $scope.$watch('currentMode', function (newValue, oldValue) {
+                $el.find('*[np-tab=' + oldValue + ']').removeClass('active')
+                $el.find('*[np-tab=' + newValue + ']').addClass('active')
+              })
+            }
+          }
+        }
+      }
+    })
+    .directive('npTab', function () {
+      return {
+        restrict: 'A',
+        link: function ($scope, $el, attrs) {
+          if (!attrs.npTab) {
+            console.error('npTab requires a name.')
+            return
+          }
+
+          if (!$scope.currentMode) {
+            $scope.currentMode = attrs.npTab
+          }
+
+          $el.find('a').click(function () {
+            if ($scope.currentMode === attrs.npTab) {
+              return
+            }
+
+            $scope.currentMode = attrs.npTab
+            $scope.$apply()
+          })
+        }
+      }
+    })
+    .directive('npTabPane', function () {
+      return {
+        restrict: 'A',
+        link: function ($scope, $el, attrs) {
+          if (!attrs.npTabPane) {
+            console.error('npTabPane requires a name.')
+            return
+          }
+
+          if ($scope.currentMode !== attrs.npTabPane) {
+            $el.hide()
+          }
         }
       }
     })

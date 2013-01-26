@@ -62,7 +62,7 @@
 
             // TODO: Standardize this somewhere. Add another directive to the tab view that emits events
             // to child directives like this one.
-            $el.parents('.tabbable').find('a[data-toggle=tab]').click(function () {
+            $el.parents('*[np-tab-view]').find('li[np-tab] a').click(function () {
               $timeout(function () {
                 mirror.refresh()
               })

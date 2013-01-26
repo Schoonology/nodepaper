@@ -14,7 +14,14 @@ app
   .use(express.bodyParser())
   .use(express.query())
   .use(app.router)
-  .use(express.static(path.resolve(__dirname, '..', rc.paths.static))) // TODO: Cache.
+  // TODO: Cache.
+  .use('/static', express.static(path.resolve(__dirname, '..', rc.paths.static)))
+  .use('/editor', function (req, res, next) {
+    res.sendfile(path.resolve(__dirname, '..', rc.paths.static, 'editor', 'index.html'))
+  })
+  .use('/', function (req, res, next) {
+    res.sendfile(path.resolve(__dirname, '..', rc.paths.static, 'index.html'))
+  })
   .use(express.errorHandler())
 
 http.createServer(app).listen(rc.port, function (err) {
@@ -29,21 +36,21 @@ http.createServer(app).listen(rc.port, function (err) {
 //
 // ## Routes
 //
-app.put('*', middleware('validateSecret'))
-app.all('/ping', middleware('ping'))
+app.put('/api/*', middleware('validateSecret'))
+app.all('/api/ping', middleware('ping'))
 
-// app.get('/articles', middleware('findResource')(lib('article')))
-// app.get('/articles/:name', middleware('getResource')(lib('article')))
-// app.put('/articles/:name', middleware('putResource')(lib('article')))
+// app.get('/api/articles', middleware('findResource')(lib('article')))
+// app.get('/api/articles/:name', middleware('getResource')(lib('article')))
+// app.put('/api/articles/:name', middleware('putResource')(lib('article')))
 
-app.get('/pages', middleware('findResource')(lib('page')))
-app.get('/pages/:name', middleware('getResource')(lib('page')))
-app.put('/pages/:name', middleware('putResource')(lib('page')))
+app.get('/api/pages', middleware('findResource')(lib('page')))
+app.get('/api/pages/:name', middleware('getResource')(lib('page')))
+app.put('/api/pages/:name', middleware('putResource')(lib('page')))
 
-// app.get('/authors', middleware('findResource')(lib('author')))
-// app.get('/authors/:name', middleware('getResource')(lib('author')))
-// app.put('/authors/:name', middleware('putResource')(lib('author')))
+// app.get('/api/authors', middleware('findResource')(lib('author')))
+// app.get('/api/authors/:name', middleware('getResource')(lib('author')))
+// app.put('/api/authors/:name', middleware('putResource')(lib('author')))
 
-// app.get('/media', middleware('findResource')(lib('media')))
-// app.get('/media/:name', middleware('getResource')(lib('media')))
-// app.put('/media/:name', middleware('putResource')(lib('media')))
+// app.get('/api/media', middleware('findResource')(lib('media')))
+// app.get('/api/media/:name', middleware('getResource')(lib('media')))
+// app.put('/api/media/:name', middleware('putResource')(lib('media')))

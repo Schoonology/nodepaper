@@ -32,21 +32,25 @@
       })
     }
 
+    function getApiPath(path) {
+      return '/api' + path
+    }
+
     return {
       save: function save(path, body) {
-        return request('PUT', path, body).then(function (result) {
+        return request('PUT', getApiPath(path), body).then(function (result) {
           // TODO
           return result.data
         })
       },
       load: function load(path) {
-        return request('GET', path).then(function (result) {
+        return request('GET', getApiPath(path)).then(function (result) {
           // TODO
           return result.data
         })
       },
       find: function find(path) {
-        return request('GET', path).then(function (result) {
+        return request('GET', getApiPath(path)).then(function (result) {
           // TODO
           return result.data
         })
