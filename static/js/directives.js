@@ -100,13 +100,13 @@
         }
       }
     })
-    .directive('npRenderTemplate', function ($compile) {
+    .directive('npRender', function ($compile) {
       return {
         restrict: 'A',
         link: function ($scope, $el, attrs) {
           $scope.$watch(
             function (scope) {
-              return $scope.$eval(attrs.template)
+              return $scope.$eval(attrs.npRender)
             },
             function (value) {
               $el.html(value)
