@@ -1,6 +1,5 @@
 /*global angular, CodeMirror */
-/*jshint browser:true */
-(function (global) {
+;(function (global) {
   function toString(value) {
     if (angular.isUndefined(value) || value === null) {
       return ''
@@ -71,4 +70,4 @@
         }
       }
     })
-})(window)
+})(this)

@@ -1,6 +1,5 @@
 /*global angular */
-/*jshint browser:true */
-(function (global) {
+;(function (global) {
   angular
     .module('nodepaper.directives', [])
     .directive('npActive', function ($location, $timeout) {
@@ -72,7 +71,10 @@
             $scope.currentMode = attrs.npTab
           }
 
-          $el.find('a').click(function () {
+          // Disable the default Bootstrap binding, which will break Angular routing.
+          $el.find('a').attr('href', '')
+
+          $el.find('a').click(function (event) {
             if ($scope.currentMode === attrs.npTab) {
               return
             }
@@ -98,4 +100,21 @@
         }
       }
     })
-})(window)
+    .directive('npRenderTemplate', function ($compile) {
+      return {
+        restrict: 'A',
+        link: function ($scope, $el, attrs) {
+          $scope.$watch(
+            function (scope) {
+              return $scope.$eval(attrs.template)
+            },
+            function (value) {
+              $el.html(value)
+
+              $compile($el.contents())($scope)
+            }
+          )
+        }
+      }
+    })
+})(this)

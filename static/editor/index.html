@@ -11,28 +11,24 @@
     <title>Nodepaper Editor</title>
 
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/css/style.css" rel="stylesheet">
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/static/css/editor.css" rel="stylesheet">
     <link href="/static/css/codemirror.css" rel="stylesheet">
     <link href="/static/css/codemirror/monokai.css" rel="stylesheet">
   </head>
   <body>
-    <div class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="brand" href="#">Nodepaper Editor</a>
-        </div>
-      </div>
-    </div>
     <div class="container">
       <div class="row">
-        <div class="span12">
-        </div>
-      </div>
-      <div class="row">
         <div class="span3">
-          <ul class="nav nav-list" ng-controller="PageNavController" np-active>
+          <ul class="nav nav-list well" ng-controller="PageNav" np-active>
             <li class="nav-header">Pages</li>
-            <li ng-repeat="page in pages"><a ng-href="pages/{{page}}" ng-bind="page"></a></li>
+            <li ng-repeat="page in pages">
+              <a ng-click="remove(page)" class="pull-right"><span class="icon-trash"></span></a>
+              <a ng-href="pages/{{page}}" ng-bind="page"></a>
+            </li>
+            <li>
+              <a ng-href="pages/new"><span class="icon-file"></span> New</a>
+            </li>
           </ul>
         </div>
         <div class="span9">
@@ -40,12 +36,9 @@
         </div>
       </div>
     </div>
-    <!-- <div ng-view></div> -->
 
-    <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script> -->
-    <script>window.jQuery || document.write('<script src="/static/js/lib/jquery.js"><\/script>')</script>
-    <!-- <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.js"></script> -->
-    <script>window.angular || document.write('<script src="/static/js/lib/angular.js"><\/script>')</script>
+    <script src="/static/js/lib/jquery.js"></script>
+    <script src="/static/js/lib/angular.js"></script>
     <script src="/static/js/lib/bootstrap.min.js"></script>
     <script src="/static/js/lib/codemirror.js"></script>
     <script src="/static/js/lib/codemirror/javascript.js"></script>
@@ -54,6 +47,7 @@
     <script src="/static/js/lib/codemirror/htmlmixed.js"></script>
     <script src="/static/js/lib/codemirror/edit/closetag.js"></script>
     <script src="/static/js/directive.codemirror.js"></script>
+    <script src="/static/js/controllers.js"></script>
     <script src="/static/js/directives.js"></script>
     <script src="/static/js/services.js"></script>
     <!-- <script src="/static/js/lib/lawnchair.js"></script> -->
@@ -63,7 +57,7 @@
     <script src="/static/js/lib/md5.js"></script>
     <script>
       angular
-        .module('nodepaper', ['codemirror', 'nodepaper.services', 'nodepaper.directives'])
+        .module('nodepaper', ['codemirror', 'nodepaper.directives', 'nodepaper.controllers'])
         .config(function ($routeProvider, $locationProvider) {
           $locationProvider.html5Mode(true).hashPrefix('!')
           $routeProvider
@@ -71,9 +65,13 @@
       //         template: '<div template="content"></div>',
       //         controller: ArticleController
       //       })
+            .when('/pages/new', {
+              templateUrl: '/static/partials/page.editor.html',
+              controller: 'Page'
+            })
             .when('/pages/:name', {
               templateUrl: '/static/partials/page.editor.html',
-              controller: PageEditorController
+              controller: 'Page'
             })
       //       .when('/authors/:name', {
       //         template: '<div template="content"></div>',
@@ -83,97 +81,6 @@
               redirectTo: '/'
             })
         })
-      //   .directive('template', function ($compile) {
-      //     return function template(scope, element, attrs) {
-      //       scope.$watch(
-      //         function (scope) {
-      //           return scope.$eval(attrs.template)
-      //         },
-      //         function (value) {
-      //           element.html(value)
-
-      //           $compile(element.contents())(scope)
-      //         }
-      //       )
-      //     }
-      //   })
-      function PageNavController($scope, $location, Page) {
-        $scope.pages = []
-
-        Page
-          .find()
-          .then(function (list) {
-            $scope.pages = list
-          })
-      }
-
-      function ArticleController($scope, $route, $compile, Article) {
-        var name = $route.current.params.name
-
-        Article
-          .load(name)
-          .then(function (data) {
-            Object.keys(data).forEach(function (key) {
-              $scope[key] = data[key]
-            })
-          })
-      }
-
-      function AuthorController($scope, $route, $compile, Author) {
-        var name = $route.current.params.name
-
-        Author
-          .load(name)
-          .then(function (data) {
-            Object.keys(data).forEach(function (key) {
-              $scope[key] = data[key]
-            })
-          })
-      }
-
-      function PageController($scope, $route, $compile, Page) {
-        // TODO: Load only if meta and content aren't already present (i.e. we're nested in another Controller.)
-
-        return
-
-        var name = $route.current.params.name
-
-        Page
-          .load(name)
-          .then(function (data) {
-            Object.keys(data).forEach(function (key) {
-              $scope[key] = data[key]
-            })
-          })
-      }
-
-      function PageEditorController($scope, $route, $compile, Page) {
-        var name = $route.current.params.name
-
-        $scope.previewTemplateUrl = '/static/partials/page.html'
-        $scope.meta = {}
-        $scope.content = ''
-
-        $scope.save = function () {
-          var body = {
-            meta: $scope.meta,
-            content: $scope.content
-          }
-
-          Page
-            .save(name, body)
-            .then(function (data) {
-              console.log('Saved:', data)
-            })
-        }
-
-        Page
-          .load(name)
-          .then(function (data) {
-            $scope.content = data.content
-            $scope.meta = data.meta
-          })
-      }
     </script>
   </body>
 </html>

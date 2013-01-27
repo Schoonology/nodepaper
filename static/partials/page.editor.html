@@ -1,19 +1,20 @@
-<div class="tabbable" np-tab-view>
+<div class="tabbable" np-tab-view ng-controller="Editor">
   <ul class="nav nav-tabs">
-    <li np-tab="preview"><a>Preview</a></li>
-    <li np-tab="edit-html"><a>Edit HTML</a></li>
-    <li np-tab="edit-json"><a>Edit JSON</a></li>
+    <li np-tab="preview"><a href="#preview">Preview</a></li>
+    <li np-tab="edit-html"><a href="#edit-html">Content</a></li>
+    <li np-tab="edit-json"><a href="#edit-json">Metadata</a></li>
     <li class="pull-right"><a ng-click="save()">Save</a></li>
   </ul>
   <div class="tab-content">
-    <div np-tab-pane="preview">
-      <div ng-include="previewTemplateUrl" ng-controller="PageController"></div>
+    <div np-tab-pane="preview" class="tab-pane" id="preview">
+      <div ng-include="doc.templateUrl"></div>
     </div>
-    <div np-tab-pane="edit-html">
-      <codemirror ng-model="content" mode="htmlmixed"></codemirror>
+    <div np-tab-pane="edit-html" class="tab-pane" id="edit-html">
+      <codemirror ng-model="doc.content" mode="htmlmixed"></codemirror>
     </div>
-    <div np-tab-pane="edit-json">
-      <codemirror ng-model="meta" mode="json"></codemirror>
+    <div np-tab-pane="edit-json" class="tab-pane" id="edit-json">
+      <input type="text" ng-model="doc.name">
+      <codemirror ng-model="doc.meta" mode="json"></codemirror>
     </div>
   </div>
 </div>

@@ -37,6 +37,7 @@ http.createServer(app).listen(rc.port, function (err) {
 // ## Routes
 //
 app.put('/api/*', middleware('validateSecret'))
+app.del('/api/*', middleware('validateSecret'))
 app.all('/api/ping', middleware('ping'))
 
 // app.get('/api/articles', middleware('findResource')(lib('article')))
@@ -46,6 +47,7 @@ app.all('/api/ping', middleware('ping'))
 app.get('/api/pages', middleware('findResource')(lib('page')))
 app.get('/api/pages/:name', middleware('getResource')(lib('page')))
 app.put('/api/pages/:name', middleware('putResource')(lib('page')))
+app.del('/api/pages/:name', middleware('delResource')(lib('page')))
 
 // app.get('/api/authors', middleware('findResource')(lib('author')))
 // app.get('/api/authors/:name', middleware('getResource')(lib('author')))

@@ -1,6 +1,5 @@
 /*global angular, hex_md5 */
-/*jshint browser: true*/
-(function (global) {
+;(function (global) {
   function Resource($http) {
     function request(method, url, data) {
       var headers = {}
@@ -8,7 +7,7 @@
         , nonce
         , signature
 
-      if (method.toLowerCase() === 'put' || method.toLowerCase() === 'del') {
+      if (method.toLowerCase() === 'put' || method.toLowerCase() === 'delete') {
         timestamp = Date.now()
         nonce = Math.random().toString().slice(2) + timestamp
         signature = hex_md5('removeme' + nonce)
@@ -49,6 +48,12 @@
           return result.data
         })
       },
+      remove: function remove(path) {
+        return request('DELETE', getApiPath(path)).then(function (result) {
+          // TODO
+          return result.data
+        })
+      },
       find: function find(path) {
         return request('GET', getApiPath(path)).then(function (result) {
           // TODO
@@ -70,6 +75,11 @@
     controller.load = load
     function load(name) {
       return Resource.load(root + '/' + name)
+    }
+
+    controller.remove = remove
+    function remove(name) {
+      return Resource.remove(root + '/' + name)
     }
 
     controller.find = find
@@ -94,6 +104,11 @@
       return Resource.load(root + '/' + name)
     }
 
+    controller.remove = remove
+    function remove(name) {
+      return Resource.remove(root + '/' + name)
+    }
+
     controller.find = find
     function find() {
       return Resource.find(root)
@@ -116,6 +131,11 @@
       return Resource.load(root + '/' + name)
     }
 
+    controller.remove = remove
+    function remove(name) {
+      return Resource.remove(root + '/' + name)
+    }
+
     controller.find = find
     function find() {
       return Resource.find(root)
@@ -130,4 +150,4 @@
     .factory('Article', Article)
     .factory('Author', Author)
     .factory('Page', Page)
-})(window)
+})(this)
