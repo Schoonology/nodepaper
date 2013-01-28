@@ -30,6 +30,16 @@
               <a ng-href="pages/new"><span class="icon-file"></span> New</a>
             </li>
           </ul>
+          <ul class="nav nav-list well" ng-controller="ArticleNav" np-active>
+            <li class="nav-header">Articles</li>
+            <li ng-repeat="article in articles">
+              <!-- <a ng-click="remove(article)" class="pull-right"><span class="icon-trash"></span></a> -->
+              <a ng-href="articles/{{article}}" ng-bind="article"></a>
+            </li>
+            <li>
+              <a ng-href="articles/new"><span class="icon-file"></span> New</a>
+            </li>
+          </ul>
         </div>
         <div class="span9">
           <div ng-view></div>
@@ -61,10 +71,14 @@
         .config(function ($routeProvider, $locationProvider) {
           $locationProvider.html5Mode(true).hashPrefix('!')
           $routeProvider
-      //       .when('/articles/:name', {
-      //         template: '<div template="content"></div>',
-      //         controller: ArticleController
-      //       })
+            .when('/articles/new', {
+              templateUrl: '/static/partials/article.editor.html',
+              controller: 'Article'
+            })
+            .when('/articles/:name', {
+              templateUrl: '/static/partials/article.editor.html',
+              controller: 'Article'
+            })
             .when('/pages/new', {
               templateUrl: '/static/partials/page.editor.html',
               controller: 'Page'

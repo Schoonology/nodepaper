@@ -44,6 +44,48 @@
 
       $scope.refresh()
     })
+    .controller('Article', function ($scope, $route, Article) {
+      $scope.doc = {
+        templateUrl: '/static/partials/article.html',
+        name: $route.current.params.name,
+        meta: {},
+        content: '',
+        type: Article
+      }
+
+      if (!$scope.doc.name) {
+        return
+      }
+
+      Article
+        .load($route.current.params.name)
+        .then(function (data) {
+          $scope.doc.content = data.content
+          $scope.doc.meta = data.meta
+        })
+    })
+    .controller('ArticleNav', function ($scope, $rootScope, Article) {
+      $scope.articles = []
+
+      $scope.remove = function (name) {
+        Article
+          .remove(name)
+          .then(function (data) {
+            console.log('Removed:', data)
+          })
+        $scope.refresh()
+      }
+
+      $scope.refresh = $rootScope.refreshArticleNav = function () {
+        Article
+          .find()
+          .then(function (list) {
+            $scope.articles = list
+          })
+      }
+
+      $scope.refresh()
+    })
     .controller('Editor', function ($scope, $route, $rootScope, Page) {
       $scope.save = function () {
         var name = $scope.doc.name
@@ -52,13 +94,21 @@
               content: $scope.doc.content
             }
 
-        console.log('Saving:', name, body)
+        if (name !== $route.current.params.name) {
+          console.log('Deleting:', $route.current.params.name)
+          $scope.doc.type
+            .remove($route.current.params.name)
+            .then(function (data) {
+              console.log('Deleted:', data)
+              $rootScope.refreshPageNav()
+            })
+        }
 
+        console.log('Saving:', name, body)
         $scope.doc.type
           .save(name, body)
           .then(function (data) {
             console.log('Saved:', data)
-            // TODO
             $rootScope.refreshPageNav()
           })
       }

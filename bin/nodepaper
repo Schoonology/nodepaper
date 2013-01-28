@@ -40,9 +40,9 @@ app.put('/api/*', middleware('validateSecret'))
 app.del('/api/*', middleware('validateSecret'))
 app.all('/api/ping', middleware('ping'))
 
-// app.get('/api/articles', middleware('findResource')(lib('article')))
-// app.get('/api/articles/:name', middleware('getResource')(lib('article')))
-// app.put('/api/articles/:name', middleware('putResource')(lib('article')))
+app.get('/api/articles', middleware('findResource')(lib('article')))
+app.get('/api/articles/:name', middleware('getResource')(lib('article')))
+app.put('/api/articles/:name', middleware('putResource')(lib('article')))
 
 app.get('/api/pages', middleware('findResource')(lib('page')))
 app.get('/api/pages/:name', middleware('getResource')(lib('page')))
