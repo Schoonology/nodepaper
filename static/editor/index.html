@@ -23,8 +23,8 @@
           <ul class="nav nav-list well" ng-controller="PageNav" np-active>
             <li class="nav-header">Pages</li>
             <li ng-repeat="page in pages">
-              <a ng-click="remove(page)" class="pull-right"><span class="icon-trash"></span></a>
-              <a ng-href="pages/{{page}}" ng-bind="page"></a>
+              <a ng-click="remove(page.name)" class="pull-right"><span class="icon-trash"></span></a>
+              <a ng-href="pages/{{page.name}}" ng-bind="page.name"></a>
             </li>
             <li>
               <a ng-href="pages/new"><span class="icon-file"></span> New</a>
@@ -33,8 +33,8 @@
           <ul class="nav nav-list well" ng-controller="ArticleNav" np-active>
             <li class="nav-header">Articles</li>
             <li ng-repeat="article in articles">
-              <!-- <a ng-click="remove(article)" class="pull-right"><span class="icon-trash"></span></a> -->
-              <a ng-href="articles/{{article}}" ng-bind="article"></a>
+              <!-- <a ng-click="remove(article.name)" class="pull-right"><span class="icon-trash"></span></a> -->
+              <a ng-href="articles/{{article.name}}" ng-bind="article.name"></a>
             </li>
             <li>
               <a ng-href="articles/new"><span class="icon-file"></span> New</a>

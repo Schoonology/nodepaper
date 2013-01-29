@@ -4,11 +4,18 @@
     "test": "removeme"
   },
   "paths": {
-    "static": "./static",
-    "pages": "./content/pages",
-    "articles": "./content/articles",
-    "authors": "./content/authors",
-    "media": "./content/media"
+    "static": "./static"
+  },
+  "collections": {
+    "pages": "pages",
+    "articles": "articles",
+    "authors": "authors",
+    "media": "media"
+  },
+  "mongo": {
+    "host": "localhost",
+    "port": 27017,
+    "database": "test"
   },
   "requests": {
     "window": 1000

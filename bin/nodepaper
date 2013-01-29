@@ -5,6 +5,7 @@ var lib = require('../lib')
   , http = require('http')
   , path = require('path')
   , express = require('express')
+  , mongo = lib('mongo')
   , app = express()
 
 app
@@ -24,13 +25,23 @@ app
   })
   .use(express.errorHandler())
 
-http.createServer(app).listen(rc.port, function (err) {
+function handleError(err) {
+  console.error(err.stack || err.message || err)
+  process.exit(1)
+}
+
+mongo.connect(rc.mongo, function (err) {
   if (err) {
-    console.error(err.stack || err.message || err)
-    process.exit(1)
-  } else {
-    console.info('Listening on port ' + rc.port + '...')
+    return handleError(err)
   }
+
+  http.createServer(app).listen(rc.port, function (err) {
+    if (err) {
+      return handleError(err)
+    }
+
+    console.info('Listening on port ' + rc.port + '...')
+  })
 })
 
 //
