@@ -2,7 +2,6 @@ if (require.main === module) {
   require('./bin/nodepaper')
 }
 
-
 // var Document = require('./lib/document'),
 //     Article = require('./lib/article'),
 //     Author = require('./lib/author'),

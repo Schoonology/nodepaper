@@ -13,8 +13,27 @@
       <codemirror ng-model="doc.content" mode="htmlmixed"></codemirror>
     </div>
     <div np-tab-pane="edit-json" class="tab-pane" id="edit-json">
-      <input type="text" ng-model="doc.name">
-      <codemirror ng-model="doc.meta" mode="json"></codemirror>
+      <form class="form-horizontal" ng-submit="save()">
+        <div class="control-group">
+          <label class="control-label" for="name">Name</label>
+          <div class="controls">
+            <input type="text" id="name" ng-model="doc.name">
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="title">Title</label>
+          <div class="controls">
+            <input type="text" id="title" ng-model="doc.title">
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <label class="checkbox">
+              <input type="checkbox" ng-model="doc.published"> Published
+            </label>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
 </div>

@@ -46,11 +46,11 @@
     })
     .controller('Article', function ($scope, $route, Article) {
       $scope.doc = {
+        type: Article,
         templateUrl: '/static/partials/article.html',
         name: $route.current.params.name,
-        meta: {},
-        content: '',
-        type: Article
+        title: '',
+        content: ''
       }
 
       if (!$scope.doc.name) {
@@ -60,8 +60,8 @@
       Article
         .load($route.current.params.name)
         .then(function (data) {
+          $scope.doc.title = data.title
           $scope.doc.content = data.content
-          $scope.doc.meta = data.meta
         })
     })
     .controller('ArticleNav', function ($scope, $rootScope, Article) {
@@ -89,10 +89,6 @@
     .controller('Editor', function ($scope, $route, $rootScope, Page) {
       $scope.save = function () {
         var name = $scope.doc.name
-          , body = {
-              meta: $scope.doc.meta,
-              content: $scope.doc.content
-            }
 
         if (name !== $route.current.params.name) {
           console.log('Deleting:', $route.current.params.name)
@@ -104,9 +100,9 @@
             })
         }
 
-        console.log('Saving:', name, body)
+        console.log('Saving:', name, $scope.doc)
         $scope.doc.type
-          .save(name, body)
+          .save(name, $scope.doc)
           .then(function (data) {
             console.log('Saved:', data)
             $rootScope.refreshPageNav()
