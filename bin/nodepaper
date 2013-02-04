@@ -49,21 +49,16 @@ mongo.connect(rc.mongo, function (err) {
 //
 app.put('/api/*', middleware('validateSecret'))
 app.del('/api/*', middleware('validateSecret'))
+app.all('/api/*', middleware('limitAgents'))
 app.all('/api/ping', middleware('ping'))
 
 app.get('/api/articles', middleware('findResource')(lib('article')))
+app.get('/api/articles/published', express.query(), middleware('getArticles')())
 app.get('/api/articles/:name', middleware('getResource')(lib('article')))
 app.put('/api/articles/:name', middleware('putResource')(lib('article')))
+app.del('/api/articles/:name', middleware('delResource')(lib('article')))
 
 app.get('/api/pages', middleware('findResource')(lib('page')))
 app.get('/api/pages/:name', middleware('getResource')(lib('page')))
 app.put('/api/pages/:name', middleware('putResource')(lib('page')))
 app.del('/api/pages/:name', middleware('delResource')(lib('page')))
-
-// app.get('/api/authors', middleware('findResource')(lib('author')))
-// app.get('/api/authors/:name', middleware('getResource')(lib('author')))
-// app.put('/api/authors/:name', middleware('putResource')(lib('author')))
-
-// app.get('/api/media', middleware('findResource')(lib('media')))
-// app.get('/api/media/:name', middleware('getResource')(lib('media')))
-// app.put('/api/media/:name', middleware('putResource')(lib('media')))

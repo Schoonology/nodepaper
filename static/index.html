@@ -26,18 +26,10 @@
         .config(function ($routeProvider, $locationProvider) {
           $locationProvider.html5Mode(true).hashPrefix('!')
           $routeProvider
-      //       .when('/articles/:name', {
-      //         template: '<div template="content"></div>',
-      //         controller: ArticleController
-      //       })
             .when('/:name', {
               templateUrl: '/static/partials/page.html',
               controller: 'Page'
             })
-      //       .when('/authors/:name', {
-      //         template: '<div template="content"></div>',
-      //         controller: AuthorController
-      //       })
             .otherwise({
               redirectTo: '/'
             })

@@ -20,6 +20,8 @@
         }
       }
 
+      headers['X-Nodepaper-Agent'] = 'Nodepaper'
+
       return $http({
         method: method,
         url: url,

@@ -19,5 +19,6 @@
   },
   "requests": {
     "window": 1000
-  }
+  },
+  "agentKey": "Nodepaper"
 }

@@ -50,7 +50,12 @@
         templateUrl: '/static/partials/article.html',
         name: $route.current.params.name,
         title: '',
-        content: ''
+        content: '',
+        published: null
+      }
+
+      $scope.publish = function () {
+        $scope.doc.published = Date.now()
       }
 
       if (!$scope.doc.name) {
@@ -62,6 +67,7 @@
         .then(function (data) {
           $scope.doc.title = data.title
           $scope.doc.content = data.content
+          $scope.doc.published = data.published
         })
     })
     .controller('ArticleNav', function ($scope, $rootScope, Article) {

@@ -27,10 +27,12 @@
           </div>
         </div>
         <div class="control-group">
+          <label class="control-label" for="published">Published</label>
           <div class="controls">
-            <label class="checkbox">
-              <input type="checkbox" ng-model="doc.published"> Published
-            </label>
+            <div class="input-append">
+              <input type="text" id="published" ng-model="doc.published">
+              <a class="btn" ng-click="publish()">Publish</a>
+            </div>
           </div>
         </div>
       </form>
