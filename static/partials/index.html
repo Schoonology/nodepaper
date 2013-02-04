@@ -1,0 +1,5 @@
+<h1>Nodepaper</h1>
+<div ng-repeat="article in articles">
+  <h2 ng-bind="article.title"></h2>
+  <div ng-bind-html-unsafe="article.content"></div>
+</div>

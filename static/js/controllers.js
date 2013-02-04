@@ -118,8 +118,13 @@
     .controller('Index', function ($scope, Article) {
       $scope.articles = []
 
-      Article.getPublished.then(function (data) {
+      Article.getPublished().then(function (data) {
         $scope.articles = data
+        $scope.articles.forEach(function (article, index) {
+          Article.load(article.name).then(function (data) {
+            $scope.articles[index] = data
+          })
+        })
       })
     })
 })(this)
