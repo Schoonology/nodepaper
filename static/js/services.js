@@ -1,12 +1,28 @@
 /*global angular, hex_md5 */
 ;(function (global) {
-  function Resource($http) {
+  var API_ROOT = '/api'
+
+  function npHttp($http) {
+    //
+    // Public API
+    //
+    return {
+      request: request,
+      get: get,
+      put: put,
+      del: del
+    }
+
+    //
+    // Function definitions
+    //
     function request(method, url, data) {
       var headers = {}
         , timestamp
         , nonce
         , signature
 
+      // TODO: Configure key & secret or pull from UI.
       if (method.toLowerCase() === 'put' || method.toLowerCase() === 'delete') {
         timestamp = Date.now()
         nonce = Math.random().toString().slice(2) + timestamp
@@ -33,123 +49,64 @@
       })
     }
 
-    function getApiPath(path) {
-      return '/api' + path
+    function get(path) {
+      return request('GET', API_ROOT + path)
     }
 
-    return {
-      save: function save(path, body) {
-        return request('PUT', getApiPath(path), body).then(function (result) {
-          // TODO
-          return result.data
-        })
-      },
-      load: function load(path) {
-        return request('GET', getApiPath(path)).then(function (result) {
-          // TODO
-          return result.data
-        })
-      },
-      remove: function remove(path) {
-        return request('DELETE', getApiPath(path)).then(function (result) {
-          // TODO
-          return result.data
-        })
-      },
-      find: function find(path) {
-        return request('GET', getApiPath(path)).then(function (result) {
-          // TODO
-          return result.data
-        })
+    function put(path, body) {
+      return request('PUT', API_ROOT + path, body)
+    }
+
+    function del(path) {
+      return request('DELETE', API_ROOT + path)
+    }
+  }
+
+  function npResource(root) {
+    return function (npHttp) {
+      //
+      // Public API
+      //
+      return {
+        load: load,
+        save: save,
+        remove: remove,
+        find: find,
+        getPublished: getPublished
+      }
+
+      //
+      // Function definitions
+      //
+      function pluckData(result) {
+        return result.data
+      }
+
+      function save(name, body) {
+        return npHttp.put(root + '/' + name, body).then(pluckData)
+      }
+
+      function load(name) {
+        return npHttp.get(root + '/' + name).then(pluckData)
+      }
+
+      function remove(name) {
+        return npHttp.del(root + '/' + name).then(pluckData)
+      }
+
+      function find() {
+        return npHttp.get(root).then(pluckData)
+      }
+
+      function getPublished() {
+        return npHttp.get(root + '/published').then(pluckData)
       }
     }
   }
 
-  function Article(Resource) {
-    var controller = {}
-      , root = '/articles'
-
-    controller.save = save
-    function save(name, body) {
-      return Resource.save(root + '/' + name, body)
-    }
-
-    controller.load = load
-    function load(name) {
-      return Resource.load(root + '/' + name)
-    }
-
-    controller.remove = remove
-    function remove(name) {
-      return Resource.remove(root + '/' + name)
-    }
-
-    controller.find = find
-    function find() {
-      return Resource.find(root)
-    }
-
-    return controller
-  }
-
-  function Author(Resource) {
-    var controller = {}
-      , root = '/authors'
-
-    controller.save = save
-    function save(name, body) {
-      return Resource.save(root + '/' + name, body)
-    }
-
-    controller.load = load
-    function load(name) {
-      return Resource.load(root + '/' + name)
-    }
-
-    controller.remove = remove
-    function remove(name) {
-      return Resource.remove(root + '/' + name)
-    }
-
-    controller.find = find
-    function find() {
-      return Resource.find(root)
-    }
-
-    return controller
-  }
-
-  function Page(Resource) {
-    var controller = {}
-      , root = '/pages'
-
-    controller.save = save
-    function save(name, body) {
-      return Resource.save(root + '/' + name, body)
-    }
-
-    controller.load = load
-    function load(name) {
-      return Resource.load(root + '/' + name)
-    }
-
-    controller.remove = remove
-    function remove(name) {
-      return Resource.remove(root + '/' + name)
-    }
-
-    controller.find = find
-    function find() {
-      return Resource.find(root)
-    }
-
-    return controller
-  }
-
   angular
     .module('nodepaper.services', [])
-    .factory('Resource', Resource)
-    .factory('Article', Article)
-    .factory('Author', Author)
-    .factory('Page', Page)
+    .factory('npHttp', npHttp)
+    .factory('Article', npResource('/articles'))
+    .factory('Page', npResource('/pages'))
 })(this)

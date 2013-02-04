@@ -115,4 +115,11 @@
           })
       }
     })
+    .controller('Index', function ($scope, Article) {
+      $scope.articles = []
+
+      Article.getPublished.then(function (data) {
+        $scope.articles = data
+      })
+    })
 })(this)
