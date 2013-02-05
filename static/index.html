@@ -13,6 +13,7 @@
     <link href="/static/css/style.css" rel="stylesheet">
   </head>
   <body>
+    <h1><a href="/">Nodepaper</a></h1>
     <div ng-view></div>
 
     <script src="/static/js/lib/jquery.js"></script>
@@ -29,6 +30,10 @@
             .when('/', {
               templateUrl: '/static/partials/index.html',
               controller: 'Index'
+            })
+            .when('/articles/:name', {
+              templateUrl: '/static/partials/article.html',
+              controller: 'Article'
             })
             .when('/:name', {
               templateUrl: '/static/partials/page.html',
