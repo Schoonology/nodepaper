@@ -18,7 +18,7 @@ function middleware(options) {
       function ($) {
         type.save({
           name: req.params.name || null,
-          article: req.body || {}
+          body: req.body || {}
         }, $.first())
       }
     ])

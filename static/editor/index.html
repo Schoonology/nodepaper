@@ -20,6 +20,9 @@
     <div class="container">
       <div class="row">
         <div class="span3">
+          <ul class="nav nav-list" np-active>
+            <li><a ng-href="meta">Meta</a></li>
+          </ul>
           <ul class="nav nav-list well" ng-controller="PageNav" np-active>
             <li class="nav-header">Pages</li>
             <li ng-repeat="page in pages">
@@ -86,6 +89,10 @@
             .when('/pages/:name', {
               templateUrl: '/static/partials/page.editor.html',
               controller: 'Page'
+            })
+            .when('/meta', {
+              templateUrl: '/static/partials/meta.editor.html',
+              controller: 'Meta'
             })
             .otherwise({
               redirectTo: '/'

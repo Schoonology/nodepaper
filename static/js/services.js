@@ -104,9 +104,35 @@
     }
   }
 
+  function Meta(npHttp) {
+    //
+    // Public API
+    //
+    return {
+      load: load,
+      save: save
+    }
+
+    //
+    // Function definitions
+    //
+    function pluckData(result) {
+      return result.data
+    }
+
+    function save(body) {
+      return npHttp.put('/meta', body).then(pluckData)
+    }
+
+    function load() {
+      return npHttp.get('/meta').then(pluckData)
+    }
+  }
+
   angular
     .module('nodepaper.services', [])
     .factory('npHttp', npHttp)
     .factory('Article', npResource('/articles'))
     .factory('Page', npResource('/pages'))
+    .factory('Meta', Meta)
 })(this)

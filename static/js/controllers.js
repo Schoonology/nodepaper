@@ -127,4 +127,27 @@
         })
       })
     })
+    .controller('Meta', function ($scope, Meta) {
+      $scope.doc = {
+        templateUrl: '/static/partials/meta.html',
+        type: Meta
+      }
+
+      Meta
+        .load()
+        .then(function (data) {
+          Object.keys(data).forEach(function (key) {
+            $scope.doc[key] = data[key]
+          })
+        })
+
+      $scope.save = function () {
+        console.log('Saving:', $scope.doc)
+        Meta
+          .save($scope.doc)
+          .then(function (data) {
+            console.log('Saved:', data)
+          })
+      }
+    })
 })(this)

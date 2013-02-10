@@ -9,8 +9,7 @@
   "collections": {
     "pages": "pages",
     "articles": "articles",
-    "authors": "authors",
-    "media": "media"
+    "meta": "meta"
   },
   "mongo": {
     "host": "localhost",
