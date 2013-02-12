@@ -127,13 +127,13 @@
         })
       })
     })
-    .controller('Meta', function ($scope, Meta) {
+    .controller('Config', function ($scope, Config) {
       $scope.doc = {
-        templateUrl: '/static/partials/meta.html',
-        type: Meta
+        templateUrl: '/static/partials/config.html',
+        type: Config
       }
 
-      Meta
+      Config
         .load()
         .then(function (data) {
           Object.keys(data).forEach(function (key) {
@@ -143,7 +143,7 @@
 
       $scope.save = function () {
         console.log('Saving:', $scope.doc)
-        Meta
+        Config
           .save($scope.doc)
           .then(function (data) {
             console.log('Saved:', data)

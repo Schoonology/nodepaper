@@ -63,5 +63,5 @@ app.get('/api/pages/:name', middleware('getResource')(lib('page')))
 app.put('/api/pages/:name', middleware('putResource')(lib('page')))
 app.del('/api/pages/:name', middleware('delResource')(lib('page')))
 
-app.get('/api/meta', middleware('getResource')(lib('meta')))
-app.put('/api/meta', middleware('putResource')(lib('meta')))
+app.get('/api/config', middleware('getResource')(lib('config')))
+app.put('/api/config', middleware('putResource')(lib('config')))

@@ -104,7 +104,7 @@
     }
   }
 
-  function Meta(npHttp) {
+  function Config(npHttp) {
     //
     // Public API
     //
@@ -121,11 +121,11 @@
     }
 
     function save(body) {
-      return npHttp.put('/meta', body).then(pluckData)
+      return npHttp.put('/config', body).then(pluckData)
     }
 
     function load() {
-      return npHttp.get('/meta').then(pluckData)
+      return npHttp.get('/config').then(pluckData)
     }
   }
 
@@ -134,5 +134,5 @@
     .factory('npHttp', npHttp)
     .factory('Article', npResource('/articles'))
     .factory('Page', npResource('/pages'))
-    .factory('Meta', Meta)
+    .factory('Config', Config)
 })(this)

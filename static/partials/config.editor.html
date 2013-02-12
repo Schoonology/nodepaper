@@ -1,0 +1,21 @@
+<div ng-controller="Config">
+  <form class="form-horizontal" ng-submit="save()">
+    <div class="control-group">
+      <label class="control-label" for="title">Title</label>
+      <div class="controls">
+        <input type="text" id="title" ng-model="doc.title">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="theme">Theme</label>
+      <div class="controls">
+        <input type="text" id="theme" ng-model="doc.theme">
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <a ng-click="save()" class="btn btn-primary">Save</a>
+      </div>
+    </div>
+  </form>
+</div>
