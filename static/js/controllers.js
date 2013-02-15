@@ -128,23 +128,20 @@
       })
     })
     .controller('Config', function ($scope, Config) {
-      $scope.doc = {
-        templateUrl: '/static/partials/config.html',
-        type: Config
-      }
+      $scope.config = {}
 
       Config
         .load()
         .then(function (data) {
           Object.keys(data).forEach(function (key) {
-            $scope.doc[key] = data[key]
+            $scope.config[key] = data[key]
           })
         })
 
       $scope.save = function () {
-        console.log('Saving:', $scope.doc)
+        console.log('Saving:', $scope.config)
         Config
-          .save($scope.doc)
+          .save($scope.config)
           .then(function (data) {
             console.log('Saved:', data)
           })
