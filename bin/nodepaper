@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 var lib = require('../lib')
-  , middleware = require('../middleware')
-  , rc = lib('rc')
   , http = require('http')
   , path = require('path')
   , express = require('express')
+  , rc = lib('rc')
   , mongo = lib('mongo')
   , app = express()
 
@@ -47,21 +46,21 @@ mongo.connect(rc.mongo, function (err) {
 //
 // ## Routes
 //
-app.put('/api/*', middleware('validateSecret'))
-app.del('/api/*', middleware('validateSecret'))
-app.all('/api/*', middleware('limitAgents'))
-app.all('/api/ping', middleware('ping'))
+app.put('/api/*', lib('middleware/validateSecret'))
+app.del('/api/*', lib('middleware/validateSecret'))
+app.all('/api/*', lib('middleware/limitAgents'))
+app.all('/api/ping', lib('middleware/ping'))
 
-app.get('/api/articles', middleware('findResource')(lib('article')))
-app.get('/api/articles/published', express.query(), middleware('getArticles')())
-app.get('/api/articles/:name', middleware('getResource')(lib('article')))
-app.put('/api/articles/:name', middleware('putResource')(lib('article')))
-app.del('/api/articles/:name', middleware('delResource')(lib('article')))
+app.get('/api/articles', lib('middleware/findResource')(lib('types/article')))
+app.get('/api/articles/published', express.query(), lib('middleware/getArticles')())
+app.get('/api/articles/:name', lib('middleware/getResource')(lib('types/article')))
+app.put('/api/articles/:name', lib('middleware/putResource')(lib('types/article')))
+app.del('/api/articles/:name', lib('middleware/delResource')(lib('types/article')))
 
-app.get('/api/pages', middleware('findResource')(lib('page')))
-app.get('/api/pages/:name', middleware('getResource')(lib('page')))
-app.put('/api/pages/:name', middleware('putResource')(lib('page')))
-app.del('/api/pages/:name', middleware('delResource')(lib('page')))
+app.get('/api/pages', lib('middleware/findResource')(lib('types/page')))
+app.get('/api/pages/:name', lib('middleware/getResource')(lib('types/page')))
+app.put('/api/pages/:name', lib('middleware/putResource')(lib('types/page')))
+app.del('/api/pages/:name', lib('middleware/delResource')(lib('types/page')))
 
-app.get('/api/config', middleware('getResource')(lib('config')))
-app.put('/api/config', middleware('putResource')(lib('config')))
+app.get('/api/config', lib('middleware/getResource')(lib('types/config')))
+app.put('/api/config', lib('middleware/putResource')(lib('types/config')))

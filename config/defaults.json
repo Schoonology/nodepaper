@@ -17,7 +17,7 @@
     "database": "test"
   },
   "requests": {
-    "window": 1000
-  },
-  "agentKey": "Nodepaper"
+    "window": 1000,
+    "agentKey": "Nodepaper"
+  }
 }
