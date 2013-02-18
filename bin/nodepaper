@@ -1,66 +1,26 @@
 #!/usr/bin/env node
 var lib = require('../lib')
   , http = require('http')
-  , path = require('path')
-  , express = require('express')
+  , $$ = require('stepdown')
+  , stack = lib('stack')
+  , Settings = lib('types/settings')
   , rc = lib('rc')
   , mongo = lib('mongo')
-  , app = express()
 
-app
-  .use(express.favicon()) // TODO: Provide.
-  .use(express.logger())
-  .use(express.cookieParser())
-  .use(express.bodyParser())
-  .use(express.query())
-  .use(app.router)
-  // TODO: Cache.
-  .use('/static', express.static(path.resolve(__dirname, '..', rc.paths.static)))
-  .use('/editor', function (req, res, next) {
-    res.sendfile(path.resolve(__dirname, '..', rc.paths.static, 'editor', 'index.html'))
-  })
-  .use('/', function (req, res, next) {
-    res.sendfile(path.resolve(__dirname, '..', rc.paths.static, 'index.html'))
-  })
-  .use(express.errorHandler())
-
-function handleError(err) {
+$$([
+  function ($) {
+    mongo.connect(rc.mongo, $.first())
+  },
+  function ($) {
+    Settings.load({}, $.first())
+  },
+  function ($, settings) {
+    http.createServer(stack.configure(settings)).listen(rc.port, $.first())
+  },
+  function ($) {
+    console.info('Listening on port ' + rc.port + '...')
+  }
+], function handleError(err) {
   console.error(err.stack || err.message || err)
   process.exit(1)
-}
-
-mongo.connect(rc.mongo, function (err) {
-  if (err) {
-    return handleError(err)
-  }
-
-  http.createServer(app).listen(rc.port, function (err) {
-    if (err) {
-      return handleError(err)
-    }
-
-    console.info('Listening on port ' + rc.port + '...')
-  })
 })
-
-//
-// ## Routes
-//
-app.put('/api/*', lib('middleware/validateSecret'))
-app.del('/api/*', lib('middleware/validateSecret'))
-app.all('/api/*', lib('middleware/limitAgents'))
-app.all('/api/ping', lib('middleware/ping'))
-
-app.get('/api/articles', lib('middleware/findResource')(lib('types/article')))
-app.get('/api/articles/published', express.query(), lib('middleware/getArticles')())
-app.get('/api/articles/:name', lib('middleware/getResource')(lib('types/article')))
-app.put('/api/articles/:name', lib('middleware/putResource')(lib('types/article')))
-app.del('/api/articles/:name', lib('middleware/delResource')(lib('types/article')))
-
-app.get('/api/pages', lib('middleware/findResource')(lib('types/page')))
-app.get('/api/pages/:name', lib('middleware/getResource')(lib('types/page')))
-app.put('/api/pages/:name', lib('middleware/putResource')(lib('types/page')))
-app.del('/api/pages/:name', lib('middleware/delResource')(lib('types/page')))
-
-app.get('/api/config', lib('middleware/getResource')(lib('types/config')))
-app.put('/api/config', lib('middleware/putResource')(lib('types/config')))

@@ -127,20 +127,20 @@
         })
       })
     })
-    .controller('Config', function ($scope, Config) {
-      $scope.config = {}
+    .controller('Settings', function ($scope, Settings) {
+      $scope.settings = {}
 
-      Config
+      Settings
         .load()
         .then(function (data) {
           Object.keys(data).forEach(function (key) {
-            $scope.config[key] = data[key]
+            $scope.settings[key] = data[key]
           })
         })
 
       $scope.save = function () {
-        console.log('Saving:', $scope.config)
-        Config
+        console.log('Saving:', $scope.settings)
+        Settings
           .save($scope.config)
           .then(function (data) {
             console.log('Saved:', data)

@@ -4,7 +4,8 @@
     "test": "removeme"
   },
   "paths": {
-    "static": "./static"
+    "static": "./static",
+    "themes": "./themes"
   },
   "collections": {
     "pages": "pages",

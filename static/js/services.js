@@ -104,7 +104,7 @@
     }
   }
 
-  function Config(npHttp) {
+  function Settings(npHttp) {
     //
     // Public API
     //
@@ -121,11 +121,11 @@
     }
 
     function save(body) {
-      return npHttp.put('/config', body).then(pluckData)
+      return npHttp.put('/settings', body).then(pluckData)
     }
 
     function load() {
-      return npHttp.get('/config').then(pluckData)
+      return npHttp.get('/settings').then(pluckData)
     }
   }
 
@@ -134,5 +134,5 @@
     .factory('npHttp', npHttp)
     .factory('Article', npResource('/articles'))
     .factory('Page', npResource('/pages'))
-    .factory('Config', Config)
+    .factory('Settings', Settings)
 })(this)
