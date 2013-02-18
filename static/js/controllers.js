@@ -141,7 +141,7 @@
       $scope.save = function () {
         console.log('Saving:', $scope.settings)
         Settings
-          .save($scope.config)
+          .save($scope.settings)
           .then(function (data) {
             console.log('Saved:', data)
           })
