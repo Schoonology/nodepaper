@@ -12,13 +12,12 @@
     "url": "git://github.com/Schoonology/stepdown.git"
   },
   "dependencies": {
-    "stepdown": "0.2.3",
-    "marked": "0.2.5",
-    "mongodb": "1.1.6",
-    "express": "3.0.0rc4",
-    "dustjs-linkedin": "~1.1.0",
-    "watch": "~0.5.1",
-    "jugglingdb": "~0.1.18"
+    "rc": "0.0.8",
+    "express": "~3.1.0",
+    "stepdown": "~0.3.14",
+    "consolidate": "~0.8.0",
+    "hogan.js": "~2.0.0",
+    "dustjs-linkedin": "~1.2.1"
   },
   "license": "MIT",
   "directories": {

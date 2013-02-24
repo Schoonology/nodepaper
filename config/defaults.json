@@ -1,0 +1,11 @@
+{
+  "port": 1337,
+  "paths": {
+    "pages": "./pages",
+    "articles": "./articles",
+    "static": "./static",
+    "templates": "./templates",
+    "manifest": "./manifest.json"
+  },
+  "indexSize": 3
+}
