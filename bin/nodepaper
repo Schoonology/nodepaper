@@ -1,0 +1,237 @@
+#!/usr/bin/env node
+var fs = require('fs')
+  , http = require('http')
+  , path = require('path')
+  , async = require('async')
+  , express = require('express')
+  , LRU = require('lru-cache')
+  , marked = require('marked')
+  , sorted = require('sorted')
+  , watch = require('watch')
+  , MAX_PREAMBLE_LENGTH = 1028
+  , PREAMBLE_REGEX = /([a-z]+)\s*:(.*)/i
+  , cache = LRU({
+      max: 100,
+      maxAge: 1000 * 60 * 60,
+      length: function (value) { return value.length },
+      dispose: function (key, value) {},
+      stale: true
+    })
+  , app = express()
+  , postsdir = path.resolve(process.cwd(), process.argv[2])
+  , themedir = path.resolve(process.cwd(), process.argv[3])
+  , postIndex = sorted(function (a, b) {
+      console.log(b.date, a.date, b.date - a.date)
+      return b.date - a.date
+    })
+  , monitor
+
+marked.setOptions({
+  gfm: true,
+  tables: true,
+  breaks: false,
+  pedantic: false,
+  sanitize: true,
+  smartLists: true
+})
+
+function getName(file) {
+  var name = path.relative(postsdir, file)
+    , extname = path.extname(name)
+
+  if (['.md'].indexOf(extname) < 0) {
+    return null
+  }
+
+  return path.basename(name, extname)
+}
+
+function updateIndex(file) {
+  var name = getName(file)
+
+  if (!name) {
+    return
+  }
+
+  preamble(name, function (err, meta) {
+    if (err) {
+      console.error(err)
+      return
+    }
+
+    // Pre-processing
+    meta.name = name
+    meta.date = Date.parse(meta.date)
+
+    if (postIndex[name]) {
+      postIndex.splice(postIndex[name].index, 1)
+    }
+
+    meta.index = postIndex.findIndex(meta)
+    postIndex.push(meta)
+    postIndex[name] = meta
+  })
+}
+
+function removeFromIndex(file) {
+  var name = getName(file)
+    , existing
+
+  if (!name) {
+    return
+  }
+
+  if (!postIndex[name]) {
+    return
+  }
+
+  postIndex.splice(postIndex[name].index, 1)
+  ;delete postIndex[name]
+}
+
+watch.watchTree(postsdir, function (f, curr, prev) {
+  if (typeof f === 'object' && prev === null && curr === null) {
+    Object.keys(f).forEach(updateIndex)
+  } else if (curr.nlink === 0) {
+    removeFromIndex(f)
+  } else {
+    updateIndex(f)
+  }
+})
+
+//
+// ## contents `contents(name, callback)`
+//
+// Loads the entire contents of the **name** file, passing the result to **callback**.
+//
+function contents(name, callback) {
+  fs.readFile(path.join(postsdir, name + '.md'), 'utf8', callback)
+}
+
+//
+// ## preamble `preamble(name, callback)`
+//
+// Loads and parses the **name** file, passing an Object with the parsed values to **callback**.
+//
+function preamble(name, callback) {
+  fs.open(path.join(postsdir, name + '.md'), 'r', function (err, fd) {
+    if (err) {
+      callback(err)
+      return
+    }
+
+    fs.read(fd, new Buffer(MAX_PREAMBLE_LENGTH), 0, MAX_PREAMBLE_LENGTH, 0, function (err, bytesRead, buffer) {
+      if (err) {
+        callback(err)
+        return
+      }
+
+      if (!buffer) {
+        callback(null, {})
+        return
+      }
+
+      var head = buffer.toString('utf8', 0, bytesRead)
+        , data = {}
+        , match
+        , key
+        , value
+
+      head.split('\n').every(function (line) {
+        line = line.trim()
+
+        if (line.length === 0) {
+          return true
+        }
+
+        match = PREAMBLE_REGEX.exec(line)
+
+        if (!match) {
+          return false
+        }
+
+        key = match[1].toLowerCase()
+        value = match[2].trim()
+
+        data[key] = value
+        return true
+      })
+
+      callback(null, data)
+    })
+  })
+}
+
+//
+// ## markdown `markdown(name, callback)
+//
+// Loads and parses the Markdown contents of the **name** file, passing the compiled HTML to **callback**.
+//
+function markdown(name, callback) {
+  var cached = cache.get(name)
+
+  if (cached) {
+    callback(null, cached)
+    return
+  }
+
+  contents(name, function (err, file) {
+    if (err) {
+      callback(err)
+      return
+    }
+
+    var html = marked(file)
+
+    cache.set(name, html)
+    callback(null, html)
+  })
+}
+
+//
+// ## wrapped `wrapped(html, callback)`
+//
+// Loads the configured theme and wraps **html** in it, passing the result to **callback**.
+//
+function wrapped(html, callback) {
+}
+
+app.get('/', function (req, res, next) {
+  async
+    .map(
+      postIndex.slice(0, 3).toArray(),
+      function (meta, callback) {
+        markdown(meta.name, callback)
+      },
+      function (err, htmls) {
+        if (err) {
+          next(err)
+          return
+        }
+
+        res.send(htmls.join('\n'))
+      }
+    )
+})
+
+app.get('/:name', function (req, res, next) {
+  var name = req.params.name
+
+  markdown(name, function (err, html) {
+    if (err) {
+      next(err)
+      return
+    }
+
+    res.send(html)
+  })
+})
+
+http.createServer(app).listen(8080, function (err) {
+  if (err) {
+    console.error(err)
+    process.exit(1)
+  }
+
+  console.log('Listening on port 8080...')
+})
