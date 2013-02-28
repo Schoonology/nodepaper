@@ -21,7 +21,6 @@ var fs = require('fs')
   , postsdir = path.resolve(process.cwd(), process.argv[2])
   , themedir = path.resolve(process.cwd(), process.argv[3])
   , postIndex = sorted(function (a, b) {
-      console.log(b.date, a.date, b.date - a.date)
       return b.date - a.date
     })
   , monitor
@@ -35,6 +34,11 @@ marked.setOptions({
   smartLists: true
 })
 
+//
+// ## getName `getName(file)`
+//
+// Returns either the basename-extname of **file** or null.
+//
 function getName(file) {
   var name = path.relative(postsdir, file)
     , extname = path.extname(name)
@@ -46,6 +50,11 @@ function getName(file) {
   return path.basename(name, extname)
 }
 
+//
+// ## updateIndex `updateIndex(file)`
+//
+// Updates the sorted post index with the metadata from **file**.
+//
 function updateIndex(file) {
   var name = getName(file)
 
@@ -73,6 +82,11 @@ function updateIndex(file) {
   })
 }
 
+//
+// ## removeFromIndex `removeFromIndex(file)`
+//
+// Removes the index for **file**.
+//
 function removeFromIndex(file) {
   var name = getName(file)
     , existing
@@ -89,23 +103,78 @@ function removeFromIndex(file) {
   ;delete postIndex[name]
 }
 
-watch.watchTree(postsdir, function (f, curr, prev) {
-  if (typeof f === 'object' && prev === null && curr === null) {
-    Object.keys(f).forEach(updateIndex)
-  } else if (curr.nlink === 0) {
-    removeFromIndex(f)
-  } else {
-    updateIndex(f)
+//
+// ## parsePreamble `parsePreamble(file)`
+//
+// Parses the parsePreamble from **file**, returning a tuple of { meta: rest }.
+//
+function parsePreamble(file) {
+  var data = {}
+    , active = true
+    , match
+    , key
+    , value
+
+  file = file.split('\n').filter(function (line) {
+    if (!active) {
+      return true
+    }
+
+    line = line.trim()
+
+    if (line.length === 0) {
+      return false
+    }
+
+    match = PREAMBLE_REGEX.exec(line)
+
+    if (!match) {
+      active = false
+      return true
+    }
+
+    key = match[1].toLowerCase()
+    value = match[2].trim()
+
+    data[key] = value
+    return false
+  }).join('\n')
+
+  return {
+    meta: data,
+    rest: file
   }
-})
+}
 
 //
 // ## contents `contents(name, callback)`
 //
-// Loads the entire contents of the **name** file, passing the result to **callback**.
+// Loads the entire contents of the **name** file, passing the result as a { meta, md } tuple to **callback**.
 //
 function contents(name, callback) {
-  fs.readFile(path.join(postsdir, name + '.md'), 'utf8', callback)
+  var cached = cache.get(name)
+
+  if (cached) {
+    callback(null, cached)
+    return
+  }
+
+  fs.readFile(path.join(postsdir, name + '.md'), 'utf8', function (err, file) {
+    if (err) {
+      callback(err)
+      return
+    }
+
+    var data = parsePreamble(file)
+
+    data = {
+      meta: data.meta,
+      html: marked(data.rest)
+    }
+
+    cache.set(name, data)
+    callback(null, data)
+  })
 }
 
 //
@@ -114,51 +183,13 @@ function contents(name, callback) {
 // Loads and parses the **name** file, passing an Object with the parsed values to **callback**.
 //
 function preamble(name, callback) {
-  fs.open(path.join(postsdir, name + '.md'), 'r', function (err, fd) {
+  contents(name, function (err, tuple) {
     if (err) {
       callback(err)
       return
     }
 
-    fs.read(fd, new Buffer(MAX_PREAMBLE_LENGTH), 0, MAX_PREAMBLE_LENGTH, 0, function (err, bytesRead, buffer) {
-      if (err) {
-        callback(err)
-        return
-      }
-
-      if (!buffer) {
-        callback(null, {})
-        return
-      }
-
-      var head = buffer.toString('utf8', 0, bytesRead)
-        , data = {}
-        , match
-        , key
-        , value
-
-      head.split('\n').every(function (line) {
-        line = line.trim()
-
-        if (line.length === 0) {
-          return true
-        }
-
-        match = PREAMBLE_REGEX.exec(line)
-
-        if (!match) {
-          return false
-        }
-
-        key = match[1].toLowerCase()
-        value = match[2].trim()
-
-        data[key] = value
-        return true
-      })
-
-      callback(null, data)
-    })
+    callback(null, tuple.meta)
   })
 }
 
@@ -168,23 +199,13 @@ function preamble(name, callback) {
 // Loads and parses the Markdown contents of the **name** file, passing the compiled HTML to **callback**.
 //
 function markdown(name, callback) {
-  var cached = cache.get(name)
-
-  if (cached) {
-    callback(null, cached)
-    return
-  }
-
-  contents(name, function (err, file) {
+  contents(name, function (err, tuple) {
     if (err) {
       callback(err)
       return
     }
 
-    var html = marked(file)
-
-    cache.set(name, html)
-    callback(null, html)
+    callback(null, tuple.html)
   })
 }
 
@@ -194,6 +215,7 @@ function markdown(name, callback) {
 // Loads the configured theme and wraps **html** in it, passing the result to **callback**.
 //
 function wrapped(html, callback) {
+  callback(null, [].concat(html).join('\n'))
 }
 
 app.get('/', function (req, res, next) {
@@ -209,7 +231,14 @@ app.get('/', function (req, res, next) {
           return
         }
 
-        res.send(htmls.join('\n'))
+        wrapped(htmls, function (err, html) {
+          if (err) {
+            next(err)
+            return
+          }
+
+          res.send(html)
+        })
       }
     )
 })
@@ -223,8 +252,25 @@ app.get('/:name', function (req, res, next) {
       return
     }
 
-    res.send(html)
+    wrapped(html, function (err, html) {
+      if (err) {
+        next(err)
+        return
+      }
+
+      res.send(html)
+    })
   })
+})
+
+watch.watchTree(postsdir, function (f, curr, prev) {
+  if (typeof f === 'object' && prev === null && curr === null) {
+    Object.keys(f).forEach(updateIndex)
+  } else if (curr.nlink === 0) {
+    removeFromIndex(f)
+  } else {
+    updateIndex(f)
+  }
 })
 
 http.createServer(app).listen(8080, function (err) {
