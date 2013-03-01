@@ -8,6 +8,8 @@ var http = require('http')
   , app = express()
   , server = http.createServer(app)
   , renderer = new Renderer(rc)
+  , REQUIRED_FIELDS = ['port', 'postdir', 'themedir']
+  , reqsMet = true
 
 // Paas support
 if (process.env.PORT) {
@@ -15,6 +17,17 @@ if (process.env.PORT) {
 }
 
 debug('Configuration: %s', JSON.stringify(rc, null, 2))
+
+REQUIRED_FIELDS.forEach(function (field) {
+  if (!rc[field]) {
+    console.error('Missing required field:', field)
+    reqsMet = false
+  }
+})
+
+if (!reqsMet) {
+  process.exit(2)
+}
 
 app.get('/', function (req, res, next) {
   renderer
