@@ -33,6 +33,15 @@ if (!reqsMet) {
 app.get('/', function (req, res, next) {
   renderer
     .index()
+    .then(null, function (err) {
+      if (typeof err === 'number') {
+        return renderer.error(err)
+      }
+
+      console.error(err.stack || err.message || err)
+
+      return renderer.error(500)
+    })
     .then(function (html) {
       res.send(html)
     }, function (err) {
@@ -45,12 +54,23 @@ app.use('/theme', express.static(path.resolve(process.cwd(), rc.assetdir)))
 app.get('/:name', function (req, res, next) {
   renderer
     .single(req.params.name)
+    .then(null, function (err) {
+      if (typeof err === 'number') {
+        return renderer.error(err)
+      }
+
+      console.error(err.stack || err.message || err)
+
+      return renderer.error(500)
+    })
     .then(function (html) {
       res.send(html)
     }, function (err) {
       next(err)
     })
 })
+
+app.use(express.errorHandler())
 
 renderer
   .start()
