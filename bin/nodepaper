@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 var http = require('http')
+  , path = require('path')
   , debug = require('debug')('nodepaper:bin')
   , express = require('express')
   , rc = require('rc')('nodepaper', require('../config'))
@@ -8,7 +9,7 @@ var http = require('http')
   , app = express()
   , server = http.createServer(app)
   , renderer = new Renderer(rc)
-  , REQUIRED_FIELDS = ['port', 'postdir', 'themedir']
+  , REQUIRED_FIELDS = ['port', 'postdir', 'theme']
   , reqsMet = true
 
 // Paas support
@@ -38,6 +39,8 @@ app.get('/', function (req, res, next) {
       next(err)
     })
 })
+
+app.use('/theme', express.static(path.resolve(process.cwd(), rc.assetdir)))
 
 app.get('/:name', function (req, res, next) {
   renderer
