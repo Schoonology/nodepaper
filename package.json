@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "A very simple Node.js-based content management system.",
   "main": "index.js",
+  "bin": {
+    "nodepaper": "bin/nodepaper"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
