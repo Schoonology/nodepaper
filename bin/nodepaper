@@ -1,85 +1,13 @@
 #!/usr/bin/env node
-var http = require('http')
-  , path = require('path')
-  , debug = require('debug')('nodepaper:bin')
-  , express = require('express')
-  , rc = require('rc')('nodepaper', require('../config'))
-  , nodefn = require('when/node/function')
-  , Renderer = require('../lib/renderer')
-  , app = express()
-  , server = http.createServer(app)
-  , renderer = new Renderer(rc)
-  , REQUIRED_FIELDS = ['port', 'postdir', 'themedir']
-  , reqsMet = true
+var NPServer = require('../lib/server')
+  , server = new NPServer()
 
-// Paas support
-if (process.env.PORT) {
-  rc.port = process.env.PORT
-}
-
-debug('Configuration: %s', JSON.stringify(rc, null, 2))
-
-REQUIRED_FIELDS.forEach(function (field) {
-  if (!rc[field]) {
-    console.error('Missing required field:', field)
-    reqsMet = false
-  }
-})
-
-if (!reqsMet) {
-  process.exit(2)
-}
-
-app.get('/', function (req, res, next) {
-  renderer
-    .index()
-    .then(null, function (err) {
-      if (typeof err === 'number') {
-        return renderer.error(err)
-      }
-
-      console.error(err.stack || err.message || err)
-
-      return renderer.error(500)
-    })
-    .then(function (html) {
-      res.send(html)
-    }, function (err) {
-      next(err)
-    })
-})
-
-app.use('/theme', express.static(path.resolve(process.cwd(), rc.themedir)))
-
-app.get('/:name', function (req, res, next) {
-  renderer
-    .single(req.params.name)
-    .then(null, function (err) {
-      if (typeof err === 'number') {
-        return renderer.error(err)
-      }
-
-      console.error(err.stack || err.message || err)
-
-      return renderer.error(500)
-    })
-    .then(function (html) {
-      res.send(html)
-    }, function (err) {
-      next(err)
-    })
-})
-
-app.use(express.errorHandler())
-
-renderer
+server
   .start()
   .then(function () {
-    return nodefn.call(server.listen.bind(server), rc.port)
-  })
-  .then(function () {
-    console.log('Listening on port ' + rc.port + '...')
+    console.log('Started.')
   }, function (err) {
+    console.error('Failed to start.')
     console.error(err.stack || err.message || err)
     process.exit(1)
   })
