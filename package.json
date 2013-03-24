@@ -23,7 +23,8 @@
     "async": "~0.2.5",
     "debug": "~0.7.2",
     "when": "~1.8.1",
-    "rc": "~0.0.8"
+    "rc": "~0.0.8",
+    "dustjs-linkedin": "~1.2.1"
   },
   "license": "MIT",
   "directories": {
